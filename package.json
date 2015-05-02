@@ -1,0 +1,32 @@
+{
+  "name": "tree-iterator",
+  "version": "0.1.0",
+  "description": "Iterator for walking trees",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zoubin/tree-iterator.git"
+  },
+  "keywords": [
+    "iterator",
+    "tree",
+    "post-order",
+    "dependency",
+    "cycle"
+  ],
+  "author": "zoubin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zoubin/tree-iterator/issues"
+  },
+  "homepage": "https://github.com/zoubin/tree-iterator",
+  "devDependencies": {
+    "mocha": "^2.2.4"
+  }
+}
