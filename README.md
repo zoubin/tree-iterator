@@ -13,7 +13,7 @@ var walker = PostOrderTreeIterator(root, successors, visited);
 
 * `root`: [String|Number]. It is the root (key) of tree.
 * `successors`: [Function]. It accepts a node (key), and returns the successors, which can either be `Array`, or `Object` with a `.next` method;
-* `visited`: [Object]. Used to avoid revisit the same node in graph walking.
+* `visited`: [Object]. Used to avoid revisiting the same node in [graph walking](https://github.com/zoubin/deps-iterator). Visited nodes are excluded from later paths.
 
 It returns a object with a `.next` method, which implements the [Iterator Interface](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface)
 
