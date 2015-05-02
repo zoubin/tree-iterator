@@ -63,6 +63,31 @@ describe('post order tree walker', function () {
             value: undefined
         });
     });
+    it('three nodes, common successor', function () {
+        var tree = {
+            0: [1, 2],
+            1: [2]
+        };
+        var walker = PostOrderTreeIterator(0, function (node) {
+            return tree[node];
+        });
+        assert.deepEqual(walker.next(), {
+            done: false,
+            value: 2
+        });
+        assert.deepEqual(walker.next(), {
+            done: false,
+            value: 1
+        });
+        assert.deepEqual(walker.next(), {
+            done: false,
+            value: 0
+        });
+        assert.deepEqual(walker.next(), {
+            done: true,
+            value: undefined
+        });
+    });
     it('three nodes, parent and children', function () {
         var tree = {
             0: [1, 2]
