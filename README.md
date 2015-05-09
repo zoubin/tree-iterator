@@ -16,7 +16,7 @@ var PostOrderTree = require('tree-iterator');
 
 ### for (var node of iterable)
 
-### iter = iterable[Symbol.iterator]()
+### iter = iterable\[Symbol.iterator\]()
 
 ### iterable.on('cycle', cb)
 
