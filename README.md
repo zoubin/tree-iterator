@@ -81,7 +81,7 @@ ordered: [ 3, 2, 1, 0  ]
 cycle detected: [ 0, 1, 2, 0  ]
 ```
 
-**iterable[Symbol.iterator]()**
+**iterable\[Symbol.iterator\]()**
 
 ```javascript
 var PostOrderTree = require('tree-iterator');
