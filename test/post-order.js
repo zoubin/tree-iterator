@@ -1,337 +1,181 @@
-var assert = require('assert');
-var PostOrderTreeIterator = require('..').postOrder;
+var test = require('tape');
+var PostOrderTree = require('..');
 
-describe('post order tree walker', function () {
-    it('single node', function () {
-        var tree = {
-            0: []
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+test('single node', function (t) {
+    var tree = {
+        0: []
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('two nodes', function () {
-        var tree = {
-            0: [1]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var walker = nodes[Symbol.iterator]();
+    t.deepEqual(walker.next(), {
+        done: false,
+        value: 0
+    }, 'first iteration, not done');
+    t.deepEqual(walker.next(), {
+        done: true,
+        value: undefined
+    }, 'second iteration, done');
+    t.end();
+});
+test('two nodes', function (t) {
+    var tree = {
+        0: [1]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('three nodes, grandparent, parent and child', function () {
-        var tree = {
-            0: [1],
-            1: [2]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var ordered = walk(nodes);
+    t.deepEqual(ordered, [1, 0]);
+    t.end();
+});
+test('three nodes, grandparent, parent and child', function (t) {
+    var tree = {
+        0: [1],
+        1: [2]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('three nodes, common successor', function () {
-        var tree = {
-            0: [1, 2],
-            1: [2]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var ordered = walk(nodes);
+    t.deepEqual(ordered, [2, 1, 0]);
+    t.end();
+});
+test('three nodes, common successor', function (t) {
+    var tree = {
+        0: [1, 2],
+        1: [2]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('three nodes, parent and children', function () {
-        var tree = {
-            0: [1, 2]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var ordered = walk(nodes);
+    t.deepEqual(ordered, [2, 1, 0]);
+    t.end();
+});
+test('three nodes, parent and children', function (t) {
+    var tree = {
+        0: [1, 2]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('more than three nodes, grandparent and grand children', function () {
-        var tree = {
-            0: [1, 2],
-            2: [3]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 3
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var ordered = walk(nodes);
+    t.deepEqual(ordered, [1, 2, 0]);
+    t.end();
+});
+test('more than three nodes, grandparent and grand children', function (t) {
+    var tree = {
+        0: [1, 2],
+        2: [3]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('cycle, single node', function () {
-        var tree = {
-            0: [0]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        var res = walker.next();
-        assert.equal(res.done, false);
-        assert.equal(res.value, undefined);
-        assert.equal(res.error instanceof Error, true);
-        assert.deepEqual(res.cycle, ['0', '0']);
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var ordered = walk(nodes);
+    t.deepEqual(ordered, [1, 3, 2, 0]);
+    t.end();
+});
+test('cycle, single node', function (t) {
+    t.plan(2);
+    var tree = {
+        0: [0]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
     });
-    it('cycle, two nodes', function () {
-        var tree = {
-            0: [1],
-            1: [0]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        var res = walker.next();
-        assert.deepEqual(res.cycle, ['0', '1', '0']);
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
-    });
-    it('cycle, triangle', function () {
-        var tree = {
-            0: [1],
-            1: [2],
-            2: [0]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        var res = walker.next();
-        assert.deepEqual(res.cycle, ['0', '1', '2', '0']);
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
-    });
-    it('cycle, 4 nodes with triangle, case 1', function () {
-        var tree = {
-            0: [1],
-            1: [2],
-            2: [0, 3]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-        var res = walker.next();
-        assert.deepEqual(res.cycle, ['0', '1', '2', '0']);
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 3
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
-    });
-    it('cycle, 4 nodes with triangle, case 2', function () {
-        var tree = {
-            0: [1],
-            1: [2],
-            2: [3, 0]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 3
-        });
-
-        assert.deepEqual(walker.next().cycle, ['0', '1', '2', '0']);
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
-    });
-    it('two cycles', function () {
-        var tree = {
-            0: [1, 3],
-            1: [2],
-            2: [0],
-            3: [2]
-        };
-        var walker = PostOrderTreeIterator(0, function (node) {
-            return tree[node];
-        });
-
-        assert.deepEqual(walker.next().cycle, ['0', '1', '2', '0']);
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 2
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 1
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 3
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: false,
-            value: 0
-        });
-
-        assert.deepEqual(walker.next(), {
-            done: true,
-            value: undefined
-        });
+    var ordered = walk(nodes);
+    nodes.on('cycle', function (cycle) {
+        t.deepEqual(ordered, [0]);
+        t.deepEqual(cycle, [0, 0]);
     });
 });
+test('cycle, two nodes', function (t) {
+    t.plan(2);
+    var tree = {
+        0: [1],
+        1: [0]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
+    });
+    var ordered = walk(nodes);
+    nodes.on('cycle', function (cycle) {
+        t.deepEqual(cycle, [0, 1, 0]);
+        t.deepEqual(ordered, [1, 0]);
+    });
+});
+test('cycle, triangle', function (t) {
+    t.plan(2);
+    var tree = {
+        0: [1],
+        1: [2],
+        2: [0]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
+    });
+    var ordered = walk(nodes);
+    nodes.on('cycle', function (cycle) {
+        t.deepEqual(cycle, [0, 1, 2, 0]);
+        t.deepEqual(ordered, [2, 1, 0]);
+    });
+});
+test('cycle, 4 nodes with triangle, case 1', function (t) {
+    t.plan(2);
+    var tree = {
+        0: [1],
+        1: [2],
+        2: [0, 3]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
+    });
+    var ordered = walk(nodes);
+    nodes.on('cycle', function (cycle) {
+        t.deepEqual(cycle, [0, 1, 2, 0]);
+        t.deepEqual(ordered, [3, 2, 1, 0]);
+    });
+});
+test('cycle, 4 nodes with triangle, case 2', function (t) {
+    t.plan(2);
+    var tree = {
+        0: [1],
+        1: [2],
+        2: [3, 0]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
+    });
+    var ordered = walk(nodes);
+    nodes.on('cycle', function (cycle) {
+        t.deepEqual(cycle, [0, 1, 2, 0]);
+        t.deepEqual(ordered, [3, 2, 1, 0]);
+    });
+});
+test('two cycles', function (t) {
+    t.plan(2);
+    var tree = {
+        0: [1, 3],
+        1: [2],
+        2: [0],
+        3: [2]
+    };
+    var nodes = PostOrderTree(0, function (node) {
+        return tree[node];
+    });
+    var ordered = walk(nodes);
+    nodes.on('cycle', function (cycle) {
+        t.deepEqual(cycle, [0, 1, 2, 0]);
+        t.deepEqual(ordered, [2, 1, 3, 0]);
+    });
+});
+
+function walk(nodes) {
+    var ordered = [];
+    for (var n of nodes) {
+        ordered.push(n);
+    }
+    return ordered;
+}

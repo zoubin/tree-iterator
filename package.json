@@ -1,13 +1,13 @@
 {
   "name": "tree-iterator",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Iterator for walking trees",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha test/*.js"
+    "test": "tape test/*.js | faucet"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/zoubin/tree-iterator",
   "devDependencies": {
-    "mocha": "^2.2.4"
+    "faucet": "0.0.1",
+    "tape": "^4.0.0"
   }
 }
